@@ -3,8 +3,6 @@ let semesterData = {}; // Store courses grouped by semester
 const semesterOrder = {
     'FIRST SEMESTER': 1,
     'SECOND SEMESTER': 2,
-    'THIRD SEMESTER': 3,
-    'FOURTH SEMESTER': 4
 };
 
 function getSortedSemesterKeys() {
@@ -113,7 +111,7 @@ async function addCourse() {
         grade,
         qp: parseFloat(qp),
         session,
-        level
+        level: level.toUpperCase()
     };
 
 
