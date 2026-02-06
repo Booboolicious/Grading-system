@@ -33,18 +33,20 @@
             </div>
     
             <div class="social-logins">
-                <button class="btn btn-social btn-google" onclick="alert('Google login setup required')">
+                <button class="btn btn-social btn-google" onclick="loginWithGoogle()">
+
                     <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google">
                     Continue with Google
                 </button>
-                <button class="btn btn-social btn-github" onclick="alert('GitHub login setup required')">
+                <button class="btn btn-social btn-github" onclick="loginWithGithub()">
                     <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
                     Continue with GitHub
                 </button>
-                <button class="btn btn-social btn-facebook" onclick="alert('Facebook login setup required')">
+                <button class="btn btn-social btn-facebook" onclick="loginWithFacebook()">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook">
                     Continue with Facebook
                 </button>
+
             </div>
     
             <p id="authToggleText" style="margin-top: 25px; font-size: 0.9em; text-align: center;">

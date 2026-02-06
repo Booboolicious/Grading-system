@@ -74,11 +74,25 @@ function toggleAuth(e) {
     }
 }
 
+function loginWithGoogle() {
+    window.location.href = '/api/auth/google/login';
+}
+
+function loginWithGithub() {
+    window.location.href = '/api/auth/github/login';
+}
+
+function loginWithFacebook() {
+    window.location.href = '/api/auth/facebook/login';
+}
+
+
 function showApp() {
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('mainApp').style.display = 'block';
     document.getElementById('displayUsername').innerText = currentUser.username;
 }
+
 
 function logout() {
     localStorage.removeItem('user');
