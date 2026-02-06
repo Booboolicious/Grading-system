@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -30,11 +31,16 @@ var db *sql.DB
 
 func initDB() {
 	var err error
-	db, err = sql.Open("sqlite3", "./data/grading_system.db")
+	dbPath := os.Getenv("DATABASE_URL")
+	if dbPath == "" {
+		dbPath = "./data/grading_system.db"
+	}
+	db, err = sql.Open("sqlite3", dbPath)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
 
 	sqlStmt := `
 	CREATE TABLE IF NOT EXISTS courses (
@@ -163,7 +169,11 @@ func main() {
 
 	mux.Handle("/", fs)
 
-	port := ":8081"
-	fmt.Printf("Server starting at http://localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, mux))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
+	fmt.Printf("Server starting at http://localhost:%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, mux))
+
 }
