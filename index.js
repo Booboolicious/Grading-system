@@ -2,11 +2,11 @@ let semesterData = {}; // Store courses grouped by semester
 
 // Grade points scale
 const gradeScale = {
-    'A': { minScore: 70, points: 4.0 },
-    'B': { minScore: 60, points: 3.0 },
-    'C': { minScore: 50, points: 2.0 },
-    'D': { minScore: 45, points: 1.0 },
-    'E': { minScore: 40, points: 0.0 },
+    'A': { minScore: 70, points: 5.0 },
+    'B': { minScore: 60, points: 4.0 },
+    'C': { minScore: 50, points: 3.0 },
+    'D': { minScore: 45, points: 2.0 },
+    'E': { minScore: 40, points: 1.0 },
     'F': { minScore: 0, points: 0.0 }
 };
 
