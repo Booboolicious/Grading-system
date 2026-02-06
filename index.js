@@ -104,7 +104,7 @@ async function addCourse() {
 
     const course = {
         courseCode,
-        courseTitle,
+        courseTitle: courseTitle.toUpperCase(),
         semester,
         creditHours,
         score,
