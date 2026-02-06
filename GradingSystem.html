@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Transcript System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .btn-add {
+            background: #333;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #555;
+        }
+
+        .btn-clear {
+            background: white;
+            color: #333;
+            border: 1px solid #333;
+        }
+
+        .btn-clear:hover {
+            background: #f0f0f0;
+        }
+
+        .transcript-header {
+            text-align: center;
+            border: 2px solid #000;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .transcript-section {
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #000;
+            margin-bottom: 20px;
+        }
+
+        thead {
+            background: white;
+        }
+
+        th {
+            border: 1px solid #000;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        td {
+            border: 1px solid #000;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .row-number {
+            text-align: center;
+            font-weight: bold;
+            width: 40px;
+        }
+
+        .credit-hours {
+            text-align: center;
+            width: 50px;
+        }
+
+        .score {
+            text-align: center;
+            width: 60px;
+        }
+
+        .grade {
+            text-align: center;
+            font-weight: bold;
+            width: 60px;
+        }
+
+        .qp {
+            text-align: center;
+            width: 50px;
+        }
+
+        .totals-row {
+            font-weight: bold;
+            background: white;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .gpa-section {
+            border: 2px solid #000;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.05em;
+            margin-bottom: 20px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-row-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .semester-session {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .form-section {
+                display: none;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Input Form -->
+        <div class="form-section">
+            <h2>Add Course Record</h2>
+            
+            <div class="semester-session">
+                <div class="form-group">
+                    <label for="semester">Semester</label>
+                    <select id="semester" required>
+                        <option value="">Select Semester</option>
+                        <option value="FIRST SEMESTER">First Semester</option>
+                        <option value="SECOND SEMESTER">Second Semester</option>
+                        <option value="THIRD SEMESTER">Third Semester</option>
+                        <option value="FOURTH SEMESTER">Fourth Semester</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="session">Session/Year</label>
+                    <input type="text" id="session" placeholder="e.g., 2022/2023" required>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="courseCode">Course Code</label>
+                    <input type="text" id="courseCode" placeholder="e.g., CSC313" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseTitle">Course Title</label>
+                    <input type="text" id="courseTitle" placeholder="e.g., Computer Architecture I" required>
+                </div>
+                <div class="form-group">
+                    <label for="creditHours">Credit Hours (CH)</label>
+                    <input type="number" id="creditHours" placeholder="e.g., 3" min="1" max="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="score">Score (0-100)</label>
+                    <input type="number" id="score" placeholder="e.g., 58" min="0" max="100" required>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-clear" onclick="clearForm()">Clear</button>
+                <button class="btn btn-add" onclick="addCourse()">Add Course</button>
+            </div>
+        </div>
+
+        <!-- Transcript Display -->
+        <div class="transcript-section" id="transcriptSection" style="display: none;">
+            <!-- Header -->
+            <div class="transcript-header" id="transcriptHeader"></div>
+
+            <!-- Statistics -->
+            <div class="stats" id="statsContainer"></div>
+
+            <!-- Table -->
+            <div id="tableContainer"></div>
+
+            <!-- GPA Section -->
+            <div class="gpa-section" id="gpaSection"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState">
+            <div class="empty-message">No courses added yet. Add a course to get started!</div>
+        </div>
+    </div>
+
+    <script>
+        let courses = [];
+        let currentSemester = '';
+        let currentSession = '';
+
+        // Grade points scale
+        const gradeScale = {
+            'A': { minScore: 70, points: 4.0 },
+            'B': { minScore: 60, points: 3.0 },
+            'C': { minScore: 50, points: 2.0 },
+            'D': { minScore: 40, points: 1.0 },
+            'F': { minScore: 0, points: 0.0 },
+            'E': { minScore: 0, points: 0.0 }
+        };
+
+        function getGrade(score) {
+            if (score >= 70) return 'A';
+            if (score >= 60) return 'B';
+            if (score >= 50) return 'C';
+            if (score >= 40) return 'D';
+            return 'F';
+        }
+
+        function getQualityPoints(grade, creditHours) {
+            const points = gradeScale[grade].points;
+            return (points * creditHours).toFixed(2);
+        }
+
+        function addCourse() {
+            const courseCode = document.getElementById('courseCode').value.trim();
+            const courseTitle = document.getElementById('courseTitle').value.trim();
+            const semester = document.getElementById('semester').value;
+            const session = document.getElementById('session').value.trim();
+            const creditHours = parseInt(document.getElementById('creditHours').value);
+            const score = parseInt(document.getElementById('score').value);
+
+            if (!courseCode || !courseTitle || !semester || !session || !creditHours || isNaN(score)) {
+                alert('Please fill in all fields correctly');
+                return;
+            }
+
+            if (score < 0 || score > 100) {
+                alert('Score must be between 0 and 100');
+                return;
+            }
+
+            // Set semester and session from first course
+            if (courses.length === 0) {
+                currentSemester = semester;
+                currentSession = session;
+            } else if (currentSemester !== semester || currentSession !== session) {
+                alert('All courses must be from the same semester and session');
+                return;
+            }
+
+            const grade = getGrade(score);
+            const qp = getQualityPoints(grade, creditHours);
+
+            const course = {
+                id: Date.now(),
+                courseCode,
+                courseTitle,
+                creditHours,
+                score,
+                grade,
+                qp: parseFloat(qp)
+            };
+
+            courses.push(course);
+            clearForm();
+            renderTranscript();
+        }
+
+        function clearForm() {
+            document.getElementById('courseCode').value = '';
+            document.getElementById('courseTitle').value = '';
+            document.getElementById('creditHours').value = '';
+            document.getElementById('score').value = '';
+            document.getElementById('courseCode').focus();
+        }
+
+        function deleteCourse(id) {
+            courses = courses.filter(course => course.id !== id);
+            if (courses.length === 0) {
+                currentSemester = '';
+                currentSession = '';
+            }
+            renderTranscript();
+        }
+
+        function calculateGPA() {
+            if (courses.length === 0) return 0;
+            const totalQP = courses.reduce((sum, c) => sum + c.qp, 0);
+            const totalCH = courses.reduce((sum, c) => sum + c.creditHours, 0);
+            return (totalQP / totalCH).toFixed(2);
+        }
+
+        function renderTranscript() {
+            const emptyState = document.getElementById('emptyState');
+            const transcriptSection = document.getElementById('transcriptSection');
+
+            if (courses.length === 0) {
+                emptyState.style.display = 'block';
+                transcriptSection.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            transcriptSection.style.display = 'block';
+
+            // Render Header
+            const semesterDisplay = currentSemester.toUpperCase();
+            document.getElementById('transcriptHeader').innerHTML = 
+                `${semesterDisplay} RESULTS OF ${currentSession} SESSION - LEVEL: 500L`;
+
+            // Render Table
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 100px;">CourseCode</th>
+                            <th>CourseTitle</th>
+                            <th class="credit-hours">CH</th>
+                            <th class="score">Score</th>
+                            <th class="grade">Grade</th>
+                            <th class="qp">QP</th>
+                            <th style="width: 80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let totalCH = 0;
+            let totalQP = 0;
+
+            courses.forEach((course, index) => {
+                totalCH += course.creditHours;
+                totalQP += course.qp;
+
+                tableHTML += `
+                    <tr>
+                        <td class="row-number">${index + 1}</td>
+                        <td><strong>${course.courseCode}</strong></td>
+                        <td>${course.courseTitle}</td>
+                        <td class="credit-hours">${course.creditHours}</td>
+                        <td class="score">${course.score}</td>
+                        <td class="grade">${course.grade}</td>
+                        <td class="qp">${course.qp}</td>
+                        <td style="text-align: center;">
+                            <button class="delete-btn" onclick="deleteCourse(${course.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    <tr class="totals-row">
+                        <td colspan="3" style="text-align: right;">Total:</td>
+                        <td class="credit-hours">${totalCH}</td>
+                        <td></td>
+                        <td></td>
+                        <td class="qp">${totalQP.toFixed(2)}</td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('tableContainer').innerHTML = tableHTML;
+
+            // Render GPA
+            const gpa = calculateGPA();
+            const cgpa = (gpa * 1.2).toFixed(2); // CGPA calculation (example)
+            document.getElementById('gpaSection').innerHTML = `GPA: ${gpa} | CGPA: ${cgpa}`;
+
+            // Render Stats
+            renderStats(totalCH, totalQP, gpa);
+        }
+
+        function renderStats(totalCH, totalQP, gpa) {
+            const averageScore = (courses.reduce((sum, c) => sum + c.score, 0) / courses.length).toFixed(2);
+            const highestScore = Math.max(...courses.map(c => c.score));
+            const lowestScore = Math.min(...courses.map(c => c.score));
+
+            const statsHTML = `
+                <div class="stat-card">
+                    <h3>Total Courses</h3>
+                    <div class="value">${courses.length}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Credit Hours</h3>
+                    <div class="value">${totalCH}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Score</h3>
+                    <div class="value">${averageScore}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>GPA</h3>
+                    <div class="value">${gpa}</div>
+                </div>
+            `;
+
+            document.getElementById('statsContainer').innerHTML = statsHTML;
+        }
+
+        document.getElementById('courseCode').focus();
+    </script>
+</body>
+</html>
