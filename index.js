@@ -1,5 +1,33 @@
 let semesterData = {}; // Store courses grouped by semester
 
+async function loadCourses() {
+    try {
+        const response = await fetch('/api/courses');
+        const courses = await response.json();
+
+        // Reset semesterData
+        semesterData = {};
+
+        // Group courses by semester and session
+        courses.forEach(course => {
+            const semesterKey = `${course.semester}|${course.session}`;
+            if (!semesterData[semesterKey]) {
+                semesterData[semesterKey] = {
+                    semester: course.semester,
+                    session: course.session,
+                    courses: []
+                };
+            }
+            semesterData[semesterKey].courses.push(course);
+        });
+
+        renderTranscript();
+    } catch (error) {
+        console.error('Error loading courses:', error);
+    }
+}
+
+
 // Grade points scale
 const gradeScale = {
     'A': { minScore: 70, points: 5.0 },
@@ -25,7 +53,7 @@ function getQualityPoints(grade, creditHours) {
     return (points * creditHours).toFixed(2);
 }
 
-function addCourse() {
+async function addCourse() {
     const courseCode = document.getElementById('courseCode').value.trim();
     const courseTitle = document.getElementById('courseTitle').value.trim();
     const semester = document.getElementById('semester').value;
@@ -47,9 +75,9 @@ function addCourse() {
     const qp = getQualityPoints(grade, creditHours);
 
     const course = {
-        id: Date.now(),
         courseCode,
         courseTitle,
+        semester,
         creditHours,
         score,
         grade,
@@ -57,22 +85,28 @@ function addCourse() {
         session
     };
 
-    // Create key for semester-session combination
-    const semesterKey = `${semester}|${session}`;
+    try {
+        const response = await fetch('/api/courses', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(course),
+        });
 
-    // Initialize if doesn't exist
-    if (!semesterData[semesterKey]) {
-        semesterData[semesterKey] = {
-            semester: semester,
-            session: session,
-            courses: []
-        };
+        if (response.ok) {
+            clearForm();
+            loadCourses(); // Refresh data from server
+        } else {
+            alert('Failed to add course');
+        }
+    } catch (error) {
+        console.error('Error adding course:', error);
+        alert('Error connecting to server');
     }
-
-    semesterData[semesterKey].courses.push(course);
-    clearForm();
-    renderTranscript();
 }
+
+
 
 function clearForm() {
     document.getElementById('courseCode').value = '';
@@ -82,17 +116,25 @@ function clearForm() {
     document.getElementById('courseCode').focus();
 }
 
-function deleteCourse(semesterKey, courseId) {
-    if (semesterData[semesterKey]) {
-        semesterData[semesterKey].courses = semesterData[semesterKey].courses.filter(c => c.id !== courseId);
+async function deleteCourse(semesterKey, courseId) {
+    if (!confirm('Are you sure you want to delete this course?')) return;
 
-        // Delete semester if no courses left
-        if (semesterData[semesterKey].courses.length === 0) {
-            delete semesterData[semesterKey];
+    try {
+        const response = await fetch(`/api/courses/${courseId}`, {
+            method: 'DELETE',
+        });
+
+        if (response.ok) {
+            loadCourses(); // Refresh data
+        } else {
+            alert('Failed to delete course');
         }
+    } catch (error) {
+        console.error('Error deleting course:', error);
+        alert('Error connecting to server');
     }
-    renderTranscript();
 }
+
 
 function getLatestCourseAttempts() {
     // Get all courses and keep only the latest attempt of each course code
@@ -317,3 +359,6 @@ function renderStats(stats) {
 }
 
 document.getElementById('courseCode').focus();
+
+// Load initial data
+loadCourses();
