@@ -154,7 +154,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./"))
 	mux.Handle("/", fs)
 
-	port := ":8080"
+	port := ":8081"
 	fmt.Printf("Server starting at http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, mux))
 }
