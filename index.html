@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Transcript System</title>
+   <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Input Form -->
+        <div class="form-section">
+            <h2>Add Course Record</h2>
+            
+            <div class="semester-session">
+                <div class="form-group">
+                    <label for="semester">Semester</label>
+                    <select id="semester" required>
+                        <option value="">Select Semester</option>
+                        <option value="FIRST SEMESTER">First Semester</option>
+                        <option value="SECOND SEMESTER">Second Semester</option>
+                        <option value="THIRD SEMESTER">Third Semester</option>
+                        <option value="FOURTH SEMESTER">Fourth Semester</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="session">Session/Year</label>
+                    <input type="text" id="session" placeholder="e.g., 2022/2023" required>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="courseCode">Course Code</label>
+                    <input type="text" id="courseCode" placeholder="e.g., CSC313" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseTitle">Course Title</label>
+                    <input type="text" id="courseTitle" placeholder="e.g., Computer Architecture I" required>
+                </div>
+                <div class="form-group">
+                    <label for="creditHours">Credit Hours (CH)</label>
+                    <input type="number" id="creditHours" placeholder="e.g., 3" min="1" max="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="score">Score (0-100)</label>
+                    <input type="number" id="score" placeholder="e.g., 58" min="0" max="100" required>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-clear" onclick="clearForm()">Clear</button>
+                <button class="btn btn-add" onclick="addCourse()">Add Course</button>
+            </div>
+        </div>
+
+        <!-- Transcript Display -->
+        <div class="transcript-section" id="transcriptSection" style="display: none;">
+            <!-- Header -->
+            <div class="transcript-header" id="transcriptHeader"></div>
+
+            <!-- Statistics -->
+            <div class="stats" id="statsContainer"></div>
+
+            <!-- Table -->
+            <div id="tableContainer"></div>
+
+            <!-- GPA Section -->
+            <div class="gpa-section" id="gpaSection"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState">
+            <div class="empty-message">No courses added yet. Add a course to get started!</div>
+        </div>
+    </div>
+
+   <script src="index.js"></script>
+</body>
+</html>
