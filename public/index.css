@@ -305,6 +305,31 @@ th {
     text-transform: uppercase;
 }
 
+.delete-btn {
+    background: transparent;
+    color: var(--text-muted);
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fecaca;
+    transform: scale(1.1);
+}
+
+.delete-btn svg {
+    width: 18px;
+    height: 18px;
+}
 /* Responsive */
 @media (max-width: 640px) {
     .app-header {
@@ -329,26 +354,28 @@ th {
 /* Print */
 @media print {
     .no-print {
-        display: none !important;
-    }
-
-    body {
-        background: white !important;
-        color: black !important;
+            display: none !important;
         }
-        
+    
+        body {
+            background: white !important;
+            color: black !important;
+        }
+    
         .container {
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
-        
+    
         .transcript-header {
             background: #eee !important;
             color: black !important;
-    table,
-    th,
-    td {
-        border: 1px solid #000 !important;
-    }
+        }
+    
+        table,
+        th,
+        td {
+            border: 1px solid #000 !important;
+        }
 }
