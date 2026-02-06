@@ -241,13 +241,22 @@ function renderTranscript() {
     let allTablesHTML = '';
     let allStats = { totalCourses: 0, totalCH: 0, totalScore: 0 };
 
-    // Sort semesters
-    const sortedSemesters = Object.keys(semesterData).sort();
+    // Sort semesters by session and then semester
+    const sortedSemesters = Object.keys(semesterData).sort((a, b) => {
+        const [semA, sessA] = a.split('|');
+        const [semB, sessB] = b.split('|');
+        if (sessA !== sessB) return sessA.localeCompare(sessB);
+        return semA.localeCompare(semB);
+    });
 
     sortedSemesters.forEach((semesterKey, index) => {
         const semData = semesterData[semesterKey];
         const semesterDisplay = semData.semester.toUpperCase();
-        const courses = semData.courses;
+
+        // Sort courses alphabetically by course code (handles numeric parts naturally with numeric: true)
+        const courses = [...semData.courses].sort((a, b) =>
+            a.courseCode.localeCompare(b.courseCode, undefined, { numeric: true, sensitivity: 'base' })
+        );
 
         allTablesHTML += `
     <div class="transcript-header">${semesterDisplay} RESULTS OF ${semData.session} SESSION - LEVEL: 500L</div>
@@ -304,6 +313,7 @@ function renderTranscript() {
         });
 
         const semesterGPA = calculateSemesterGPA(courses);
+
 
         allTablesHTML += `
             <tr class="totals-row">
