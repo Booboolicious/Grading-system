@@ -99,7 +99,34 @@ body {
         border-color: var(--primary);
         box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
     }
-    
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 50px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.password-toggle:hover {
+    color: var(--primary);
+}
     .btn {
         padding: 12px 24px;
         border-radius: 12px;
