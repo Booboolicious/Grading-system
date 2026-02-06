@@ -103,8 +103,8 @@ async function addCourse() {
     const qp = getQualityPoints(grade, creditHours);
 
     const course = {
-        courseCode,
-        courseTitle: courseTitle.toUpperCase(),
+        courseTitle,
+        courseCode: courseCode.toUpperCase(),
         semester,
         creditHours,
         score,
