@@ -1,6 +1,6 @@
 * {
     margin: 0;
-        padding: 0;
+    padding: 0;
         box-sizing: border-box;
     }
 
@@ -133,6 +133,7 @@ body {
 .btn-print:hover {
     background: #2ecc71;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -259,7 +260,7 @@ tbody tr:hover {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     margin-bottom: 20px;
-    }
+}
 
 /* Print Styles */
 @media print {
@@ -274,7 +275,6 @@ tbody tr:hover {
             max-width: 100%;
             width: 100%;
         }
-    
         .form-section,
         .no-print,
         .delete-btn {
@@ -287,19 +287,16 @@ tbody tr:hover {
 
         table {
         page-break-inside: auto;
-        }
-        
-        tr {
+    tr {
         page-break-inside: avoid;
         page-break-after: auto;
-        }
-        
-        .transcript-header {
-            background-color: #eee !important;
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-        }
-        
-        .stat-card {
-            border: 1px solid #000;
+    .transcript-header {
+        background-color: #eee !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
+    
+    .stat-card {
+        border: 1px solid #000;
+    }
+}
