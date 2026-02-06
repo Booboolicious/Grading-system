@@ -326,6 +326,46 @@ th {
     text-transform: uppercase;
 }
 
+.delete-btn {
+    background: transparent;
+    color: var(--text-muted);
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fecaca;
+    transform: scale(1.1);
+}
+
+.delete-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Semester Spacing */
+.transcript-section+.transcript-section {
+    margin-top: 3rem;
+}
+
+.gpa-section {
+    background: #f1f5f9;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    display: inline-block;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1rem;
+    margin-bottom: 3rem;
+}
 /* Mobile Tweaks (under 480px) */
 @media (max-width: 480px) {
     .container {
