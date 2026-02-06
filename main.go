@@ -18,11 +18,13 @@ type Course struct {
 	CourseTitle string  `json:"courseTitle"`
 	Semester    string  `json:"semester"`
 	Session     string  `json:"session"`
+	Level       string  `json:"level"`
 	CreditHours int     `json:"creditHours"`
 	Score       int     `json:"score"`
 	Grade       string  `json:"grade"`
 	QP          float64 `json:"qp"`
 }
+
 
 var db *sql.DB
 
@@ -40,12 +42,14 @@ func initDB() {
 		course_title TEXT,
 		semester TEXT,
 		session TEXT,
+		level TEXT,
 		credit_hours INTEGER,
 		score INTEGER,
 		grade TEXT,
 		qp REAL
 	);
 	`
+
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
@@ -54,7 +58,8 @@ func initDB() {
 }
 
 func getCoursesHandler(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query("SELECT id, course_code, course_title, semester, session, credit_hours, score, grade, qp FROM courses")
+	rows, err := db.Query("SELECT id, course_code, course_title, semester, session, level, credit_hours, score, grade, qp FROM courses")
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -64,13 +69,14 @@ func getCoursesHandler(w http.ResponseWriter, r *http.Request) {
 	var courses []Course
 	for rows.Next() {
 		var c Course
-		err = rows.Scan(&c.ID, &c.CourseCode, &c.CourseTitle, &c.Semester, &c.Session, &c.CreditHours, &c.Score, &c.Grade, &c.QP)
+		err = rows.Scan(&c.ID, &c.CourseCode, &c.CourseTitle, &c.Semester, &c.Session, &c.Level, &c.CreditHours, &c.Score, &c.Grade, &c.QP)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		courses = append(courses, c)
 	}
+
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(courses)
@@ -89,12 +95,13 @@ func addCourseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stmt, err := db.Prepare("INSERT INTO courses(course_code, course_title, semester, session, credit_hours, score, grade, qp) VALUES(?, ?, ?, ?, ?, ?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO courses(course_code, course_title, semester, session, level, credit_hours, score, grade, qp) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	res, err := stmt.Exec(c.CourseCode, c.CourseTitle, c.Semester, c.Session, c.CreditHours, c.Score, c.Grade, c.QP)
+	res, err := stmt.Exec(c.CourseCode, c.CourseTitle, c.Semester, c.Session, c.Level, c.CreditHours, c.Score, c.Grade, c.QP)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

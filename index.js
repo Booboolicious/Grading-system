@@ -1,16 +1,29 @@
 let semesterData = {}; // Store courses grouped by semester
 
+const semesterOrder = {
+    'FIRST SEMESTER': 1,
+    'SECOND SEMESTER': 2,
+    'THIRD SEMESTER': 3,
+    'FOURTH SEMESTER': 4
+};
+
 function getSortedSemesterKeys() {
     return Object.keys(semesterData).sort((a, b) => {
         const [semA, sessA] = a.split('|');
         const [semB, sessB] = b.split('|');
-        // Sort by session first (e.g., "2023/2024")
+
+        // Sort by session in ascending order (earliest session first)
         const sessionComparison = sessA.localeCompare(sessB, undefined, { numeric: true });
         if (sessionComparison !== 0) return sessionComparison;
-        // Then sort by semester name (e.g., "FIRST SEMESTER" < "SECOND SEMESTER")
-        return semA.localeCompare(semB);
+
+
+        // Then sort by semester order (FIRST < SECOND)
+        const orderA = semesterOrder[semA] || 99;
+        const orderB = semesterOrder[semB] || 99;
+        return orderA - orderB;
     });
 }
+
 
 
 async function loadCourses() {
