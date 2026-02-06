@@ -1,5 +1,18 @@
 let semesterData = {}; // Store courses grouped by semester
 
+function getSortedSemesterKeys() {
+    return Object.keys(semesterData).sort((a, b) => {
+        const [semA, sessA] = a.split('|');
+        const [semB, sessB] = b.split('|');
+        // Sort by session first (e.g., "2023/2024")
+        const sessionComparison = sessA.localeCompare(sessB, undefined, { numeric: true });
+        if (sessionComparison !== 0) return sessionComparison;
+        // Then sort by semester name (e.g., "FIRST SEMESTER" < "SECOND SEMESTER")
+        return semA.localeCompare(semB);
+    });
+}
+
+
 async function loadCourses() {
     try {
         const response = await fetch('/api/courses');
@@ -142,7 +155,8 @@ function getLatestCourseAttempts() {
     const courseMap = {};
     const creditHourMap = {}; // Track accumulated credit hours per course
 
-    const sortedSemesters = Object.keys(semesterData).sort();
+    const sortedSemesters = getSortedSemesterKeys();
+
 
     sortedSemesters.forEach(semesterKey => {
         const semData = semesterData[semesterKey];
@@ -166,7 +180,8 @@ function getLatestCourseAttempts() {
 
 function getAccumulatedCreditHours(courseCode) {
     let totalCH = 0;
-    const sortedSemesters = Object.keys(semesterData).sort();
+    const sortedSemesters = getSortedSemesterKeys();
+
 
     sortedSemesters.forEach(semesterKey => {
         const semData = semesterData[semesterKey];
@@ -209,8 +224,9 @@ function calculateCumulativeGPA() {
 
 function isCarriedOver(courseCode, semesterKey) {
     // Check if this course appears in later semesters
-    const sortedSemesters = Object.keys(semesterData).sort();
+    const sortedSemesters = getSortedSemesterKeys();
     const currentSemesterIndex = sortedSemesters.indexOf(semesterKey);
+
 
     for (let i = currentSemesterIndex + 1; i < sortedSemesters.length; i++) {
         const laterSemData = semesterData[sortedSemesters[i]];
@@ -241,13 +257,9 @@ function renderTranscript() {
     let allTablesHTML = '';
     let allStats = { totalCourses: 0, totalCH: 0, totalScore: 0 };
 
-    // Sort semesters by session and then semester
-    const sortedSemesters = Object.keys(semesterData).sort((a, b) => {
-        const [semA, sessA] = a.split('|');
-        const [semB, sessB] = b.split('|');
-        if (sessA !== sessB) return sessA.localeCompare(sessB);
-        return semA.localeCompare(semB);
-    });
+    // Sort semesters by session and then semester name
+    const sortedSemesters = getSortedSemesterKeys();
+
 
     sortedSemesters.forEach((semesterKey, index) => {
         const semData = semesterData[semesterKey];
