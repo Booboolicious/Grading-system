@@ -1,4 +1,5 @@
-let semesterData = {}; // Store courses grouped by semester
+let semesterData = {};
+let currentUser = JSON.parse(localStorage.getItem('user')) || null;
 
 const semesterOrder = {
     'FIRST SEMESTER': 1,
@@ -9,30 +10,103 @@ function getSortedSemesterKeys() {
     return Object.keys(semesterData).sort((a, b) => {
         const [semA, sessA] = a.split('|');
         const [semB, sessB] = b.split('|');
-
-        // Sort by session in ascending order (earliest session first)
         const sessionComparison = sessA.localeCompare(sessB, undefined, { numeric: true });
         if (sessionComparison !== 0) return sessionComparison;
-
-
-        // Then sort by semester order (FIRST < SECOND)
         const orderA = semesterOrder[semA] || 99;
         const orderB = semesterOrder[semB] || 99;
         return orderA - orderB;
     });
 }
 
+// Auth Logic
+async function handleAuth() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const isLogin = document.getElementById('authTitle').innerText === 'Login';
+    const endpoint = isLogin ? '/api/login' : '/api/signup';
 
+    if (!username || !password) {
+        alert('Please enter both username and password');
+        return;
+    }
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            if (isLogin) {
+                currentUser = data;
+                localStorage.setItem('user', JSON.stringify(data));
+                showApp();
+                loadCourses();
+            } else {
+                alert('Account created! Please login.');
+                toggleAuth();
+            }
+        } else {
+            alert(data.message || 'Authentication failed');
+        }
+    } catch (err) {
+        alert('Error connecting to server');
+    }
+}
+
+function toggleAuth(e) {
+    if (e) e.preventDefault();
+    const title = document.getElementById('authTitle');
+    const btn = document.getElementById('authBtn');
+    const toggleText = document.getElementById('authToggleText');
+
+    if (title.innerText === 'Login') {
+        title.innerText = 'Sign Up';
+        btn.innerText = 'Register';
+        toggleText.innerHTML = 'Already have an account? <a href="#" onclick="toggleAuth(event)">Login</a>';
+    } else {
+        title.innerText = 'Login';
+        btn.innerText = 'Login';
+        toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleAuth(event)">Sign Up</a>';
+    }
+}
+
+function showApp() {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('displayUsername').innerText = currentUser.username;
+}
+
+function logout() {
+    localStorage.removeItem('user');
+    currentUser = null;
+    location.reload();
+}
+
+// Wrapper for Fetch to include User ID
+async function authenticatedFetch(url, options = {}) {
+    if (!currentUser) return null;
+    const headers = {
+        ...options.headers,
+        'X-User-ID': currentUser.userId.toString()
+    };
+    return fetch(url, { ...options, headers });
+}
 
 async function loadCourses() {
+    if (!currentUser) {
+        document.getElementById('authSection').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        return;
+    }
+    showApp();
     try {
-        const response = await fetch('/api/courses');
+        const response = await authenticatedFetch('/api/courses');
         const courses = await response.json();
-
-        // Reset semesterData
         semesterData = {};
-
-        // Group courses by semester and session
         courses.forEach(course => {
             const semesterKey = `${course.semester}|${course.session}`;
             if (!semesterData[semesterKey]) {
@@ -45,14 +119,11 @@ async function loadCourses() {
             }
             semesterData[semesterKey].courses.push(course);
         });
-
-
         renderTranscript();
     } catch (error) {
         console.error('Error loading courses:', error);
     }
 }
-
 
 // Grade points scale
 const gradeScale = {
@@ -63,7 +134,6 @@ const gradeScale = {
     'E': { minScore: 40, points: 1 },
     'F': { minScore: 0, points: 0 }
 };
-
 
 function getGrade(score) {
     if (score >= 70) return 'A';
@@ -89,7 +159,6 @@ async function addCourse() {
     const score = parseInt(document.getElementById('score').value);
 
     if (!courseCode || !courseTitle || !semester || !session || !level || !creditHours || isNaN(score)) {
-
         alert('Please fill in all fields correctly');
         return;
     }
@@ -114,19 +183,16 @@ async function addCourse() {
         level: level.toUpperCase()
     };
 
-
     try {
-        const response = await fetch('/api/courses', {
+        const response = await authenticatedFetch('/api/courses', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(course),
         });
 
         if (response.ok) {
             clearForm();
-            loadCourses(); // Refresh data from server
+            loadCourses();
         } else {
             alert('Failed to add course');
         }
@@ -136,8 +202,6 @@ async function addCourse() {
     }
 }
 
-
-
 function clearForm() {
     document.getElementById('courseCode').value = '';
     document.getElementById('courseTitle').value = '';
@@ -146,70 +210,51 @@ function clearForm() {
     document.getElementById('courseCode').focus();
 }
 
-
-
 async function deleteCourse(semesterKey, courseId) {
     if (!confirm('Are you sure you want to delete this course?')) return;
-
     try {
-        const response = await fetch(`/api/courses/${courseId}`, {
+        const response = await authenticatedFetch(`/api/courses/${courseId}`, {
             method: 'DELETE',
         });
-
         if (response.ok) {
-            loadCourses(); // Refresh data
+            loadCourses();
         } else {
             alert('Failed to delete course');
         }
     } catch (error) {
         console.error('Error deleting course:', error);
-        alert('Error connecting to server');
     }
 }
 
-
 function getLatestCourseAttempts() {
-    // Get all courses and keep only the latest attempt of each course code
-    // with accumulated credit hours
     const courseMap = {};
-    const creditHourMap = {}; // Track accumulated credit hours per course
-
+    const creditHourMap = {};
     const sortedSemesters = getSortedSemesterKeys();
-
 
     sortedSemesters.forEach(semesterKey => {
         const semData = semesterData[semesterKey];
         semData.courses.forEach(course => {
-            // Accumulate credit hours
             if (!creditHourMap[course.courseCode]) {
                 creditHourMap[course.courseCode] = 0;
             }
             creditHourMap[course.courseCode] += course.creditHours;
-
-            // Update with the latest course
             courseMap[course.courseCode] = {
                 ...course,
                 accumulatedCH: creditHourMap[course.courseCode]
             };
         });
     });
-
     return Object.values(courseMap);
 }
 
 function getAccumulatedCreditHours(courseCode) {
     let totalCH = 0;
     const sortedSemesters = getSortedSemesterKeys();
-
-
     sortedSemesters.forEach(semesterKey => {
         const semData = semesterData[semesterKey];
         const coursesWithCode = semData.courses.filter(c => c.courseCode === courseCode);
-        coursesWithCode.forEach(course => {
-            totalCH += course.creditHours;
-        });
+        coursesWithCode.forEach(course => { totalCH += course.creditHours; });
     });
-
     return totalCH;
 }
 
@@ -223,38 +268,29 @@ function calculateSemesterGPA(courses) {
 function calculateCumulativeGPA() {
     const sortedSemesters = getSortedSemesterKeys();
     if (sortedSemesters.length === 0) return "0.00";
-
     let totalGPA = 0;
     sortedSemesters.forEach(key => {
         const semesterGPA = parseFloat(calculateSemesterGPA(semesterData[key].courses));
         totalGPA += semesterGPA;
     });
-
     const averageGPA = totalGPA / sortedSemesters.length;
     return averageGPA.toPrecision(3);
 }
 
-
 function isCarriedOver(courseCode, semesterKey) {
-    // Check if this course appears in PREVIOUS semesters (Post-highlight)
     const sortedSemesters = getSortedSemesterKeys();
     const currentSemesterIndex = sortedSemesters.indexOf(semesterKey);
-
     for (let i = 0; i < currentSemesterIndex; i++) {
         const earlierSemData = semesterData[sortedSemesters[i]];
         const foundCourse = earlierSemData.courses.find(c => c.courseCode === courseCode);
-        if (foundCourse) {
-            return true;
-        }
+        if (foundCourse) return true;
     }
     return false;
 }
 
-
 function renderTranscript() {
     const emptyState = document.getElementById('emptyState');
     const transcriptSection = document.getElementById('transcriptSection');
-
     const totalCourses = Object.values(semesterData).reduce((sum, sem) => sum + sem.courses.length, 0);
 
     if (totalCourses === 0) {
@@ -266,42 +302,34 @@ function renderTranscript() {
     emptyState.style.display = 'none';
     transcriptSection.style.display = 'block';
 
-    // Render all semester tables
     let allTablesHTML = '';
     let allStats = { totalCourses: 0, totalCH: 0, totalScore: 0 };
-
-    // Sort semesters by session and then semester name
     const sortedSemesters = getSortedSemesterKeys();
-
 
     sortedSemesters.forEach((semesterKey, index) => {
         const semData = semesterData[semesterKey];
         const semesterDisplay = semData.semester.toUpperCase();
-
-        // Sort courses alphabetically by course code (handles numeric parts naturally with numeric: true)
         const courses = [...semData.courses].sort((a, b) =>
             a.courseCode.localeCompare(b.courseCode, undefined, { numeric: true, sensitivity: 'base' })
         );
 
         allTablesHTML += `
-    <div class="transcript-header">${semesterDisplay} RESULTS OF ${semData.session} SESSION - LEVEL: ${semData.level}</div>
-
-
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 40px;">#</th>
-                <th style="width: 100px;">CourseCode</th>
-                <th>CourseTitle</th>
-                <th class="credit-hours">CH</th>
-                <th class="score">Score</th>
-                <th class="grade">Grade</th>
-                <th class="qp">QP</th>
-                <th style="width: 80px;">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            `;
+            <div class="transcript-header">${semesterDisplay} RESULTS OF ${semData.session} SESSION - LEVEL: ${semData.level}</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th style="width: 100px;">CourseCode</th>
+                        <th>CourseTitle</th>
+                        <th class="credit-hours">CH</th>
+                        <th class="score">Score</th>
+                        <th class="grade">Grade</th>
+                        <th class="qp">QP</th>
+                        <th style="width: 80px;" class="no-print">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
 
         let semesterTotalCH = 0;
         let semesterTotalQP = 0;
@@ -310,7 +338,6 @@ function renderTranscript() {
             const accumulatedCH = getAccumulatedCreditHours(course.courseCode);
             const gradePoints = gradeScale[course.grade].points;
             const accumulatedQP = (gradePoints * accumulatedCH).toFixed(2);
-
             semesterTotalCH += accumulatedCH;
             semesterTotalQP += parseFloat(accumulatedQP);
             allStats.totalCourses++;
@@ -323,78 +350,56 @@ function renderTranscript() {
             const chDisplay = accumulatedCH > course.creditHours ? `${course.creditHours}→${accumulatedCH}` : accumulatedCH;
 
             allTablesHTML += `
-            <tr style="${rowStyle}">
-                <td class="row-number">${courseIndex + 1}</td>
-                <td><strong>${course.courseCode}</strong>${carriedLabel}</td>
-                <td>${course.courseTitle}</td>
-                <td class="credit-hours">${chDisplay}</td>
-                <td class="score">${course.score}</td>
-                <td class="grade">${course.grade}</td>
-                <td class="qp">${accumulatedQP}</td>
-                <td style="text-align: center;">
-                    <button class="delete-btn" onclick="deleteCourse('${semesterKey}', ${course.id})">Delete</button>
-                </td>
-            </tr>
+                <tr style="${rowStyle}">
+                    <td class="row-number">${courseIndex + 1}</td>
+                    <td><strong>${course.courseCode}</strong>${carriedLabel}</td>
+                    <td>${course.courseTitle}</td>
+                    <td class="credit-hours">${chDisplay}</td>
+                    <td class="score">${course.score}</td>
+                    <td class="grade">${course.grade}</td>
+                    <td class="qp">${accumulatedQP}</td>
+                    <td style="text-align: center;" class="no-print">
+                        <button class="delete-btn" onclick="deleteCourse('${semesterKey}', ${course.id})">Delete</button>
+                    </td>
+                </tr>
             `;
         });
 
         const semesterGPA = calculateSemesterGPA(courses);
-
-
         allTablesHTML += `
-            <tr class="totals-row">
-                <td colspan="3" style="text-align: right;">Total:</td>
-                <td class="credit-hours">${semesterTotalCH}</td>
-                <td></td>
-                <td></td>
-                <td class="qp">${semesterTotalQP.toFixed(2)}</td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="gpa-section">GPA: ${semesterGPA} | CGPA: ${calculateCumulativeGPA()}</div>
-    `;
-
+                    <tr class="totals-row">
+                        <td colspan="3" style="text-align: right;">Total:</td>
+                        <td class="credit-hours">${semesterTotalCH}</td>
+                        <td></td>
+                        <td></td>
+                        <td class="qp">${semesterTotalQP.toFixed(2)}</td>
+                        <td class="no-print"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="gpa-section">GPA: ${semesterGPA} | CGPA: ${calculateCumulativeGPA()}</div>
+        `;
         if (index < sortedSemesters.length - 1) {
-            allTablesHTML += '<div style="margin-top: 40px; border-top: 2px solid #ccc; padding-top: 30px;"></div>';
+            allTablesHTML += '<div style="margin-top: 40px; border-top: 2px solid #ccc; padding-top: 30px;" class="no-print"></div>';
         }
     });
 
     document.getElementById('transcriptHeader').innerHTML = '';
     document.getElementById('tableContainer').innerHTML = allTablesHTML;
     document.getElementById('gpaSection').innerHTML = `<strong>Cumulative GPA: ${calculateCumulativeGPA()}</strong>`;
-
-    // Render Stats
     renderStats(allStats);
 }
 
 function renderStats(stats) {
     const averageScore = stats.totalCourses > 0 ? (stats.totalScore / stats.totalCourses).toFixed(2) : 0;
-
     const statsHTML = `
-    <div class="stat-card">
-        <h3>Total Courses</h3>
-        <div class="value">${stats.totalCourses}</div>
-    </div>
-    <div class="stat-card">
-        <h3>Total Credit Hours</h3>
-        <div class="value">${stats.totalCH}</div>
-    </div>
-    <div class="stat-card">
-        <h3>Average Score</h3>
-        <div class="value">${averageScore}</div>
-    </div>
-    <div class="stat-card">
-        <h3>CGPA</h3>
-        <div class="value">${calculateCumulativeGPA()}</div>
-    </div>
+        <div class="stat-card"><h3>Total Courses</h3><div class="value">${stats.totalCourses}</div></div>
+        <div class="stat-card"><h3>Total Credit Hours</h3><div class="value">${stats.totalCH}</div></div>
+        <div class="stat-card"><h3>Average Score</h3><div class="value">${averageScore}</div></div>
+        <div class="stat-card"><h3>CGPA</h3><div class="value">${calculateCumulativeGPA()}</div></div>
     `;
-
     document.getElementById('statsContainer').innerHTML = statsHTML;
 }
 
-document.getElementById('courseCode').focus();
-
-// Load initial data
+// Initial Load
 loadCourses();

@@ -9,7 +9,54 @@
 </head>
 
 <body>
-    <div class="container">
+    <div id="authSection" class="auth-container">
+        <div class="auth-card">
+            <h2 id="authTitle">Login</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <div class="button-group" style="margin-top: 20px;">
+                <button id="authBtn" class="btn btn-add" onclick="handleAuth()">Login</button>
+            </div>
+    
+            <div class="social-divider">
+                <span>OR</span>
+            </div>
+    
+            <div class="social-logins">
+                <button class="btn btn-social btn-google" onclick="alert('Google login setup required')">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google">
+                    Continue with Google
+                </button>
+                <button class="btn btn-social btn-github" onclick="alert('GitHub login setup required')">
+                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
+                    Continue with GitHub
+                </button>
+                <button class="btn btn-social btn-facebook" onclick="alert('Facebook login setup required')">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook">
+                    Continue with Facebook
+                </button>
+            </div>
+    
+            <p id="authToggleText" style="margin-top: 25px; font-size: 0.9em; text-align: center;">
+    
+                Don't have an account? <a href="#" onclick="toggleAuth(event)">Sign Up</a>
+            </p>
+        </div>
+    </div>
+    
+    <div class="container" id="mainApp" style="display: none;">
+        <div class="user-info no-print"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <span>Welcome, <strong id="displayUsername"></strong></span>
+            <button class="btn btn-clear" onclick="logout()">Logout</button>
+        </div>
+
         <!-- Input Form -->
         <div class="form-section">
             <h2>Add Course Record</h2>

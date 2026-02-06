@@ -9,8 +9,116 @@ body {
     background: #f5f5f5;
     padding: 20px;
     color: #333;
-}
+    min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .auth-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    
+    .auth-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .auth-card h2 {
+        margin-bottom: 30px;
+        text-align: center;
+        color: #333;
+        font-size: 1.8em;
+    }
+    
+    .social-divider {
+        position: relative;
+        text-align: center;
+        margin: 25px 0;
+    }
+    
+    .social-divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #eee;
+        z-index: 1;
+    }
+    
+    .social-divider span {
+        background: white;
+        padding: 0 15px;
+        color: #999;
+        font-size: 0.85em;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .social-logins {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .btn-social {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: white;
+        color: #333;
+        border: 1px solid #ddd;
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9em;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
+    .btn-social img {
+        width: 20px;
+        height: 20px;
+    
 
+        .btn-social:hover {
+            background: #fcfcfc;
+            border-color: #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+    
+        .btn-google img {
+            border-radius: 0;
+        }
+    
+        .btn-github {
+            background: #24292e;
+            color: white;
+            border-color: #24292e;
+        }
+    
+        .btn-github:hover {
+            background: #2c3238;
+        }
+    
+        .btn-facebook {
+            background: #1877f2;
+            color: white;
+            border-color: #1877f2;
+        }
+    
+        .btn-facebook:hover {
+            background: #176bef;
+        }
 .container {
     max-width: 1200px;
     margin: 0 auto;
