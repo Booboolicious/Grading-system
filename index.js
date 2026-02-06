@@ -10,6 +10,7 @@ const gradeScale = {
     'F': { minScore: 0, points: 0.0 }
 };
 
+
 function getGrade(score) {
     if (score >= 70) return 'A';
     if (score >= 60) return 'B';
