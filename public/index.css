@@ -184,7 +184,15 @@ body {
     min-height: 40px;
 }
 
+.button-group {
+    margin-top: 1.5rem;
+}
+
+.btn-full {
+    width: 100%;
+}
 .social-logins {
+
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
