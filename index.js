@@ -41,11 +41,13 @@ async function loadCourses() {
                 semesterData[semesterKey] = {
                     semester: course.semester,
                     session: course.session,
+                    level: course.level || 'N/A',
                     courses: []
                 };
             }
             semesterData[semesterKey].courses.push(course);
         });
+
 
         renderTranscript();
     } catch (error) {
@@ -84,10 +86,12 @@ async function addCourse() {
     const courseTitle = document.getElementById('courseTitle').value.trim();
     const semester = document.getElementById('semester').value;
     const session = document.getElementById('session').value.trim();
+    const level = document.getElementById('level').value.trim();
     const creditHours = parseInt(document.getElementById('creditHours').value);
     const score = parseInt(document.getElementById('score').value);
 
-    if (!courseCode || !courseTitle || !semester || !session || !creditHours || isNaN(score)) {
+    if (!courseCode || !courseTitle || !semester || !session || !level || !creditHours || isNaN(score)) {
+
         alert('Please fill in all fields correctly');
         return;
     }
@@ -108,8 +112,10 @@ async function addCourse() {
         score,
         grade,
         qp: parseFloat(qp),
-        session
+        session,
+        level
     };
+
 
     try {
         const response = await fetch('/api/courses', {
@@ -139,8 +145,10 @@ function clearForm() {
     document.getElementById('courseTitle').value = '';
     document.getElementById('creditHours').value = '';
     document.getElementById('score').value = '';
+    document.getElementById('level').value = '';
     document.getElementById('courseCode').focus();
 }
+
 
 async function deleteCourse(semesterKey, courseId) {
     if (!confirm('Are you sure you want to delete this course?')) return;
@@ -284,7 +292,8 @@ function renderTranscript() {
         );
 
         allTablesHTML += `
-    <div class="transcript-header">${semesterDisplay} RESULTS OF ${semData.session} SESSION - LEVEL: 500L</div>
+    <div class="transcript-header">${semesterDisplay} RESULTS OF ${semData.session} SESSION - LEVEL: ${semData.level}</div>
+
 
     <table>
         <thead>
