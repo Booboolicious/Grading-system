@@ -143,9 +143,9 @@ function clearForm() {
     document.getElementById('courseTitle').value = '';
     document.getElementById('creditHours').value = '';
     document.getElementById('score').value = '';
-    document.getElementById('level').value = '';
     document.getElementById('courseCode').focus();
 }
+
 
 
 async function deleteCourse(semesterKey, courseId) {
