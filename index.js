@@ -5,16 +5,17 @@ const gradeScale = {
     'A': { minScore: 70, points: 4.0 },
     'B': { minScore: 60, points: 3.0 },
     'C': { minScore: 50, points: 2.0 },
-    'D': { minScore: 40, points: 1.0 },
-    'F': { minScore: 0, points: 0.0 },
-    'E': { minScore: 0, points: 0.0 }
+    'D': { minScore: 45, points: 1.0 },
+    'E': { minScore: 40, points: 0.0 },
+    'F': { minScore: 0, points: 0.0 }
 };
 
 function getGrade(score) {
     if (score >= 70) return 'A';
     if (score >= 60) return 'B';
     if (score >= 50) return 'C';
-    if (score >= 40) return 'D';
+    if (score >= 45) return 'D';
+    if (score >= 40) return 'E';
     return 'F';
 }
 
