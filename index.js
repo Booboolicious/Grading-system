@@ -236,20 +236,20 @@ function calculateCumulativeGPA() {
 
 
 function isCarriedOver(courseCode, semesterKey) {
-    // Check if this course appears in later semesters
+    // Check if this course appears in PREVIOUS semesters (Post-highlight)
     const sortedSemesters = getSortedSemesterKeys();
     const currentSemesterIndex = sortedSemesters.indexOf(semesterKey);
 
-
-    for (let i = currentSemesterIndex + 1; i < sortedSemesters.length; i++) {
-        const laterSemData = semesterData[sortedSemesters[i]];
-        const foundCourse = laterSemData.courses.find(c => c.courseCode === courseCode);
+    for (let i = 0; i < currentSemesterIndex; i++) {
+        const earlierSemData = semesterData[sortedSemesters[i]];
+        const foundCourse = earlierSemData.courses.find(c => c.courseCode === courseCode);
         if (foundCourse) {
             return true;
         }
     }
     return false;
 }
+
 
 function renderTranscript() {
     const emptyState = document.getElementById('emptyState');
