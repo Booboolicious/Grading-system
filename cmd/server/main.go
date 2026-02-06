@@ -30,7 +30,8 @@ var db *sql.DB
 
 func initDB() {
 	var err error
-	db, err = sql.Open("sqlite3", "./grading_system.db")
+	db, err = sql.Open("sqlite3", "./data/grading_system.db")
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -158,7 +159,8 @@ func main() {
 	mux.HandleFunc("/api/courses/", deleteCourseHandler)
 
 	// Static files
-	fs := http.FileServer(http.Dir("./"))
+	fs := http.FileServer(http.Dir("./public"))
+
 	mux.Handle("/", fs)
 
 	port := ":8081"

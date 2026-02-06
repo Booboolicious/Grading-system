@@ -267,35 +267,38 @@ tbody tr:hover {
     body {
         background: white;
         padding: 0;
-    
+    }
 
-        .container {
-            box-shadow: none;
-            padding: 0;
-            max-width: 100%;
-            width: 100%;
-        }
-        .form-section,
-        .no-print,
-        .delete-btn {
-            display: none !important;
-        }
-    
-        .transcript-section {
-            margin-bottom: 0;
-        }
+    .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+        width: 100%;
+    }
 
-        table {
+    .form-section, .no-print, .delete-btn {
+        display: none !important;
+    }
+
+    .transcript-section {
+        margin-bottom: 0;
+    }
+
+    table {
         page-break-inside: auto;
+    }
+    
     tr {
         page-break-inside: avoid;
         page-break-after: auto;
+    }
+
     .transcript-header {
         background-color: #eee !important;
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
-    
+
     .stat-card {
         border: 1px solid #000;
     }
