@@ -221,25 +221,19 @@ function calculateSemesterGPA(courses) {
 }
 
 function calculateCumulativeGPA() {
-    // Use only the latest attempts of each course with accumulated credit hours
-    const latestCourses = getLatestCourseAttempts();
+    const sortedSemesters = getSortedSemesterKeys();
+    if (sortedSemesters.length === 0) return "0.00";
 
-    let totalQP = 0;
-    let totalCH = 0;
-
-    latestCourses.forEach(course => {
-        // Calculate QP using accumulated credit hours
-        const accumulatedCH = getAccumulatedCreditHours(course.courseCode);
-        const gradePoints = gradeScale[course.grade].points;
-        const qp = gradePoints * accumulatedCH;
-
-        totalQP += qp;
-        totalCH += accumulatedCH;
+    let totalGPA = 0;
+    sortedSemesters.forEach(key => {
+        const semesterGPA = parseFloat(calculateSemesterGPA(semesterData[key].courses));
+        totalGPA += semesterGPA;
     });
 
-    if (totalCH === 0) return 0;
-    return (totalQP / totalCH).toFixed(2);
+    const averageGPA = totalGPA / sortedSemesters.length;
+    return averageGPA.toPrecision(3);
 }
+
 
 function isCarriedOver(courseCode, semesterKey) {
     // Check if this course appears in later semesters
