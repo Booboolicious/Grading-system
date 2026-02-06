@@ -380,8 +380,11 @@ function renderTranscript() {
         );
 
         allTablesHTML += `
-            <div class="transcript-header">${semesterDisplay} RESULTS OF ${semData.session} SESSION - LEVEL: ${semData.level}</div>
-            <table>
+            <div class="transcript-section">
+                <div class="transcript-header">${semesterDisplay} RESULTS OF ${semData.session} SESSION - LEVEL: ${semData.level}</div>
+                <div class="table-wrapper">
+                    <table>
+
                 <thead>
                     <tr>
                         <th style="width: 40px;">#</th>
@@ -451,11 +454,14 @@ function renderTranscript() {
                     </tr>
                 </tbody>
             </table>
+            </div>
             <div class="gpa-section">GPA: ${semesterGPA} | CGPA: ${calculateCumulativeGPA()}</div>
+            </div>
         `;
         if (index < sortedSemesters.length - 1) {
             allTablesHTML += '<div style="margin-top: 40px; border-top: 2px solid #ccc; padding-top: 30px;" class="no-print"></div>';
         }
+
     });
 
     document.getElementById('transcriptHeader').innerHTML = '';
